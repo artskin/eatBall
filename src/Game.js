@@ -15,7 +15,7 @@
     Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 
     //游戏信息
-    var gameW,gameH,size,posx,posy,ball,ballColor,speed;
+    var gameW,gameH,size,posx,posy,ball,ballColor,speed,info;
     var game = {
         init : function(){
             gameW = Laya.stage.width;
@@ -47,39 +47,40 @@
             return ballColor;
         },
         createBall : function(posx,posy,size,color){
-            var qua = Math.floor(Math.random()*3 +1);
+            var qua = Math.floor(Math.random()*4 +1);
             size = Math.floor(Math.random()*10 +1) * 4;
             //随机大小
 
             switch(qua){
                 case 1:
+                    posx = -(size*3);
+                    posy = Math.floor(Math.random() * gameH);
+                    posx2 = gameW + size * 4;
+                    posy2 = Math.floor(Math.random() * gameH);
+                    
+                    break;
+                case 2:
                     posx = Math.floor(Math.random() * gameW);
                     posy = -(size*2);
                     posx2 = Math.floor(Math.random() * gameW);
-                    posy2 = gameH + size*3;
-                    break;
-                case 2:
-                    posx = gameW + size*2;
-                    posy = Math.floor(Math.random() * gameH);
-                    posx2 = -(size*2);
-                    posy2 = Math.floor(Math.random() * gameH);
+                    posy2 = gameH + size*4;
                     break;
                 case 3:
+                    posx = gameW + size*2;
+                    posy = Math.floor(Math.random() * gameH);
+                    posx2 = -(gameW + size*4);
+                    posy2 = Math.floor(Math.random() * gameH);
+                    break;
+                case 4:
                     posx = Math.floor(Math.random() * gameW);
                     posy = gameH + size*2;
                     posx2 = Math.floor(Math.random() * gameW);
-                    posy2 = -(size*3);
-                    break;
-                case 4:
-                    posx = -(size*3);
-                    posy = Math.floor(Math.random() * gameH);
-                    posx2 = gameW + size*3;
-                    posy2 = Math.floor(Math.random() * gameH);
+                    posy2 = -(gameH + size*4);
                     break;
             }
-            var info = {
-                size:size,
+            info = {
                 qua:qua,
+                size:size,
                 color:game.getColor(),
                 pos:{
                     x:posx,
@@ -88,7 +89,7 @@
                     y2:posy2
                 }
             }
-            console.table(info);
+            console.log(qua);
 
             ball = new Laya.Sprite();
 
@@ -97,12 +98,12 @@
             
             speed = Math.floor(Math.random()*4+2) * 1000;
 
-            if(qua ==2 || qua == 3){
-                Laya.Tween.from(ball,{y:info.pos.y2,x:info.pos.x2},speed,null,null,10);
+            if(qua == 4){
+                console.table(info);
+                Laya.Tween.to(ball,{x:info.pos.x2,y:info.pos.y2},speed,null,Laya.Handler.create(this,game.removeBall),10);
             }else{
-                Laya.Tween.to(ball,{y:info.pos.y2,x:info.pos.x2},speed,null,Laya.Handler.create(this,game.remove),10);
+                Laya.Tween.to(ball,{x:info.pos.x2,y:info.pos.y2},speed,null,null,10);
             }
-
             
         },
         update : function(){
@@ -110,8 +111,9 @@
             //Laya.timer.frameLoop(60,this,this.createBall());
             
         },
-        remove:function(){
-            //alert("over")
+        removeBall:function(){
+            //alert("over");
+            
         },
         addBall : function(){
             //createBall()
@@ -120,14 +122,6 @@
     }
     game.init();
 
-    Laya.timer.frameLoop(50,this,game.createBall);
-    //console.log(game.getColor());
-    
-     //Laya.timer.frameLoop(100,this,runBall)
-    //function runBall(){
-        //pos += 5;
-        //console.log("circle.x");
-        //circle.pivot(pos,pos); 
-    //}
+    Laya.timer.frameLoop(10,this,game.createBall);
 
 })();
