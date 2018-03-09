@@ -5,7 +5,7 @@
 (function(){
     //设置舞台
     //Laya.Config.isAntialias=true;//抗锯齿
-    Laya.init(375,667,Laya.WebGL);
+    Laya.init(375,609,Laya.WebGL);
     Laya.stage.bgColor = "#1b2436";
     
     //屏幕缩放模式
@@ -14,15 +14,34 @@
     Laya.stage.alignH = Laya.Stage.ALIGN_CENTER;
     Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 
+    
+
     //游戏信息
-    var gameW,gameH,size,posx,posy,ball,ballColor,speed,info;
+    var gameW,gameH,size,posx,posy,ball,hero,ballColor,speed,info,dragRegion;
     var game = {
         init : function(){
             gameW = Laya.stage.width;
             gameH = Laya.stage.height;
             
             this.createBall();
-            this.update();
+            this.player();
+            //Laya.Handler.create(this,this.player())
+        },
+        player:function(){
+            //玩家信息
+            hero = new Laya.Sprite();
+            hero.graphics.drawCircle(gameW/2,gameH/2,10,"#cc0000");
+            Laya.stage.addChild(hero);
+            hero.size(10,10);
+            console.log(hero.x)
+            //hero.mouseEnabled =true;
+            hero.on(Laya.Event.MOUSE_DOWN,this,game.onStartDrag());
+            
+        },
+        onStartDrag:function(e){
+            console.log("start move");
+            hero.startDrag(dragRegion,true,100);
+            
         },
         getColor:function(){
             //随机颜色
@@ -35,8 +54,8 @@
             }
             //十六进制颜色转化
             function colorRGB2Hex(color) {
-                var rgb = color.split(',');
-                var r = parseInt(rgb[0].split('(')[1]),
+                var rgb = color.split(','),
+                    r = parseInt(rgb[0].split('(')[1]),
                     g = parseInt(rgb[1]),
                     b = parseInt(rgb[2].split(')')[0]);
             
@@ -49,15 +68,14 @@
         createBall : function(posx,posy,size,color){
             var qua = Math.floor(Math.random()*4 +1);
             size = Math.floor(Math.random()*10 +1) * 4;
-            //随机大小
 
+            //随机大小
             switch(qua){
                 case 1:
                     posx = -(size*3);
                     posy = Math.floor(Math.random() * gameH);
                     posx2 = gameW + size * 4;
                     posy2 = Math.floor(Math.random() * gameH);
-                    
                     break;
                 case 2:
                     posx = Math.floor(Math.random() * gameW);
@@ -89,22 +107,17 @@
                     y2:posy2
                 }
             }
-            console.log(qua);
+            //console.table(info);
 
             ball = new Laya.Sprite();
 
             ball.graphics.drawCircle(info.pos.x,info.pos.y,info.size,info.color);
             Laya.stage.addChild(ball);
             
-            speed = Math.floor(Math.random()*4+2) * 1000;
+            speed = Math.floor(Math.random()*4+2) * 3000;
 
-            if(qua == 4){
-                console.table(info);
-                Laya.Tween.to(ball,{x:info.pos.x2,y:info.pos.y2},speed,null,Laya.Handler.create(this,game.removeBall),10);
-            }else{
-                Laya.Tween.to(ball,{x:info.pos.x2,y:info.pos.y2},speed,null,null,10);
-            }
-            
+            Laya.Tween.to(ball,{x:info.pos.x2,y:info.pos.y2},speed,null,Laya.Handler.create(this,game.removeBall),10);
+             
         },
         update : function(){
             
@@ -122,6 +135,6 @@
     }
     game.init();
 
-    Laya.timer.frameLoop(10,this,game.createBall);
+    Laya.timer.frameLoop(30,this,game.createBall);
 
 })();
